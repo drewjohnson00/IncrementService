@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService", "IncrementService\IncrementService.csproj", "{ED2325ED-4FE5-491A-A799-EE1CBC70D746}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService.Tests", "IncrementService.Tests\IncrementService.Tests.csproj", "{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
