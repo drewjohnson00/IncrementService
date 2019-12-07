@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService_OLD", "IncrementService\IncrementService_OLD.csproj", "{ED2325ED-4FE5-491A-A799-EE1CBC70D746}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService_OLD", "IncrementService_OLD\IncrementService_OLD.csproj", "{ED2325ED-4FE5-491A-A799-EE1CBC70D746}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService.Tests", "IncrementService.Tests\IncrementService.Tests.csproj", "{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IncrementService", "IncrementService\IncrementService.csproj", "{04921736-8563-4A7C-81CE-5C38D83C52A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService.Tests_OLD", "IncrementService.Tests_OLD\IncrementService.Tests_OLD.csproj", "{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService.Tests", "IncrementService.Tests\IncrementService.Tests.csproj", "{19F5E85B-900A-430B-A37F-EEA545A3DFED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +21,18 @@ Global
 		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED2325ED-4FE5-491A-A799-EE1CBC70D746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04921736-8563-4A7C-81CE-5C38D83C52A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04921736-8563-4A7C-81CE-5C38D83C52A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04921736-8563-4A7C-81CE-5C38D83C52A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04921736-8563-4A7C-81CE-5C38D83C52A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F5E85B-900A-430B-A37F-EEA545A3DFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F5E85B-900A-430B-A37F-EEA545A3DFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F5E85B-900A-430B-A37F-EEA545A3DFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F5E85B-900A-430B-A37F-EEA545A3DFED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
