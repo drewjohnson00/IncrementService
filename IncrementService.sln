@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService", "IncrementService\IncrementService.csproj", "{ED2325ED-4FE5-491A-A799-EE1CBC70D746}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService_OLD", "IncrementService\IncrementService_OLD.csproj", "{ED2325ED-4FE5-491A-A799-EE1CBC70D746}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncrementService.Tests", "IncrementService.Tests\IncrementService.Tests.csproj", "{7F14AB49-928E-4D5C-BE06-94B1BDD7380A}"
 EndProject
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59901F92-9143-411E-9915-CF0060BB3BB5}
 	EndGlobalSection
 EndGlobal
