@@ -69,7 +69,7 @@ namespace IncrementService.Controllers
             //    conn.Close();
             //}
 
-            bool isKeyValid = VerifyIncrementKey(key);
+            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
             if (!isKeyValid)
             {
                 return BadRequest("Increment Key is not valid.");
@@ -106,7 +106,7 @@ namespace IncrementService.Controllers
             //    conn.Close();
             //}
 
-            bool isKeyValid = VerifyIncrementKey(key);
+            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
             if (!isKeyValid)
             {
                 return BadRequest("Increment Key is not valid.");
@@ -116,7 +116,7 @@ namespace IncrementService.Controllers
 
             if(result.IsSuccess)
             {
-                return Ok(result.Results[0].NextVaue);
+                return Ok(result.Results[0].NextValue);
             }
 
             return NotFound(result.ErrorMessage);   // TODO -- Change message if user isn't admin?
@@ -127,7 +127,7 @@ namespace IncrementService.Controllers
         [HttpPut]
         public ActionResult Put(string key, long initialCount = 1)
         {
-            bool isKeyValid = VerifyIncrementKey(key);
+            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
             if (!isKeyValid)
             {
                 return BadRequest("Increment Key is not valid.");
@@ -166,21 +166,9 @@ namespace IncrementService.Controllers
             }
 
             return Ok();
-
-            //var connString = IncrementController.GetConnectionString();
-            //string query = "DELETE FROM dbo.Keys WHERE IncrementKey = @Key";
-            //using (var conn = new SqlConnection(connString))
-            //using (var cmd = new SqlCommand(query, conn))
-            //{
-            //    cmd.Parameters.Add("@Key", SqlDbType.NVarChar, 50).Value = id;
-
-            //    conn.Open();
-            //    int result = cmd.ExecuteNonQuery();
-            //    conn.Close();
-            //}
         }
 
-        private bool VerifyIncrementKey(string key)
+        private static bool VerifyIncrementKey(string key)
         {
             Match match = Regex.Match(key, @"\W");  // \W matches any non-word character...so if there is a match, it's not valid.
             return !match.Success;

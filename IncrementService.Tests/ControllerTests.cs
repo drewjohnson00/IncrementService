@@ -141,7 +141,7 @@ namespace IncrementService.Tests
             Assert.AreEqual(200, result.StatusCode); 
             Assert.AreEqual(key, value.Key);
             Assert.AreEqual(IncrementModelMock.DefaultLastUsedTime, value.LastUsed);
-            Assert.AreEqual(IncrementModelMock.DefaultNextValue, value.NextVaue);
+            Assert.AreEqual(IncrementModelMock.DefaultNextValue, value.NextValue);
         }
 
         [TestMethod]

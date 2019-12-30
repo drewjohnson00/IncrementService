@@ -20,36 +20,36 @@ namespace IncrementService.Tests
         public DataResultDto AddIncrement(string IncrementKey, long initialValue)
         {
             return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextVaue = initialValue }
+                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextValue = initialValue }
                 });
         }
 
         public DataResultDto GetAllIncrements()
         {
             return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = DefaultKeyOne, LastUsed = DefaultLastUsedTime, NextVaue = DefaultNextValue },
-                    new IncrementDto { Key = DefaultKeyTwo, LastUsed = DefaultLastUsedTime, NextVaue = DefaultNextValue }
+                new List<IncrementDto> { new IncrementDto { Key = DefaultKeyOne, LastUsed = DefaultLastUsedTime, NextValue = DefaultNextValue },
+                    new IncrementDto { Key = DefaultKeyTwo, LastUsed = DefaultLastUsedTime, NextValue = DefaultNextValue }
                 });
         }
 
         public DataResultDto GetIncrement(string IncrementKey)
         {
             return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextVaue = DefaultNextValue }
+                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextValue = DefaultNextValue }
                 });
         }
 
         public DataResultDto Increment(string IncrementKey)
         {
             return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextVaue = DefaultNextValue }
+                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextValue = DefaultNextValue }
                 });
         }
 
         public DataResultDto RemoveIncrement(string IncrementKey)
         {
             return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextVaue = 0 }
+                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DefaultLastUsedTime, NextValue = 0 }
                 });
         }
     }

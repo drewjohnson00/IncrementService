@@ -12,9 +12,18 @@ namespace IncrementService.Data
     {
         public DbSet<IncrementDto> Increments { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options) => options
-            .UseSqlServer(GetConnectionString(), providerOptions => providerOptions.CommandTimeout(10))
-            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        public IncrementContext(DbContextOptions<IncrementContext> options) : base(options) { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentException("DbContextOptionsBuilder parameter cannot be NULL.");
+            }
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+        }
+
+        //.UseSqlServer(GetConnectionString(), providerOptions => providerOptions.CommandTimeout(10))
 
 
         private static string GetConnectionString()

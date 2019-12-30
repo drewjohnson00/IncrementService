@@ -7,6 +7,9 @@ namespace IncrementService.Models
 {
     public class DataResultDto
     {
+
+        public DataResultDto() { }
+
         public DataResultDto(bool isSuccess, int errorCode, string errorMessage, List<IncrementDto> results)
         {
             IsSuccess = isSuccess;

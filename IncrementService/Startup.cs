@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using IncrementService.Models;
+using Serilog;
+using IncrementService.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace IncrementService
 {
@@ -24,17 +27,25 @@ namespace IncrementService
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public static void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(typeof(IIncrementData), typeof(IncrementModel));
+            services.AddScoped(typeof(IIncrementData), typeof(IncrementModel));
+            services.AddDbContext<IncrementContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("IncrementService"));
+            });
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            app.UseSerilogRequestLogging();
+
             if (env.IsDevelopment())
             {
+                logger.LogInformation("-- Development Mode Enabled --");
+
                 app.UseDeveloperExceptionPage();
             }
 

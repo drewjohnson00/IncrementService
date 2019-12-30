@@ -9,79 +9,77 @@ namespace IncrementService.Models
 {
     public class IncrementModel : IIncrementData
     {
+        private IncrementContext _context;
 
-        public IncrementModel()
+        public IncrementModel(IncrementContext context)
         {
+            _context = context;
         }
 
-
-        public DataResultDto AddIncrement(string IncrementKey, long initialValue)
+        public DataResultDto AddIncrement(string incrementKey, long initialValue)
         {
-            return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DateTime.Now, NextVaue = initialValue }
-    });
+            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
+
+            if (increment != null)  // does key exist?
+            {
+                return new DataResultDto(false, 0, "Key already exists.", null);
+            }
+
+            _context.Increments.Add(new IncrementDto { Key = incrementKey, LastUsed = DateTimeOffset.Now, NextValue = initialValue });
+            _context.SaveChanges();
+
+            return new DataResultDto(true, 0, "", new List<IncrementDto>{increment});
         }
 
         public DataResultDto GetAllIncrements()
         {
-            return new DataResultDto(true, 0, "", 
-                new List<IncrementDto> { new IncrementDto { Key = "One", LastUsed = DateTime.Now, NextVaue = 5 },
-                        new IncrementDto { Key = "Two", LastUsed = DateTime.Now, NextVaue = 42 }
-                });
-
-            //using (var db = new IncrementContext())
-            //{
-            //    db.Find<IncrementDto>()
-            //}
-
-
-
-
-
-
-
-            //using (var conn = new SqlConnection(connString))
-            //{
-            //    using (var cmd = new SqlCommand("SELECT * FROM Keys", conn))
-            //    {
-            //        conn.Open();
-            //        SqlDataReader reader = cmd.ExecuteReader();
-            //        while (reader.Read())
-            //        {
-            //            IncrementDto inc = new IncrementDto
-            //            {
-            //                Key = reader["IncrementKey"].ToString().Trim(' '),
-            //                NextVaue = (long)reader["NextValue"],
-            //                LastUsed = (DateTimeOffset)reader["LastUsed"]
-
-            //            };
-            //            resultList.Add(inc);
-            //        }
-            //        conn.Close();
-            //    }
-            //}
+            List<IncrementDto> increments = _context.Increments.ToList();
+            return new DataResultDto(true, 0, "", increments);
         }
 
-        public DataResultDto GetIncrement(string IncrementKey)
+        public DataResultDto GetIncrement(string incrementKey)
         {
-            return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DateTime.Now, NextVaue = 42 }
-                });
+            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
+            if (increment == null)
+            {
+                return new DataResultDto(false, 0, "Key not found.", null);
+            }
+
+            return new DataResultDto(true, 0, "", new List<IncrementDto> { increment });
         }
 
         public DataResultDto Increment(string IncrementKey)
         {
-            return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DateTime.Now, NextVaue = 42 }
-                });
+            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == IncrementKey);
+
+            if (increment == null)
+            {
+                return new DataResultDto(false, 0, "Key not found.", null);
+            }
+
+            increment.NextValue++;
+            increment.LastUsed = DateTimeOffset.Now ;
+
+            _context.SaveChanges();
+
+            return new DataResultDto(true, 0, "", new List<IncrementDto> { increment });
         }
 
-        public DataResultDto RemoveIncrement(string IncrementKey)
+        public DataResultDto RemoveIncrement(string incrementKey)
         {
-            return new DataResultDto(true, 0, "",
-                new List<IncrementDto> { new IncrementDto { Key = IncrementKey, LastUsed = DateTime.Now, NextVaue = 0 }
-    });
+            IncrementDto increment = _context.Increments.FirstOrDefault(X => X.Key == incrementKey);
+
+            if (increment == null)
+            {
+                return new DataResultDto(false, 0, "Key not found.", null);
+            }
+
+            _context.Increments.Remove(increment);
+
+            _context.SaveChanges();
+
+            return new DataResultDto(true, 0, "", null);
         }
     }
 }
