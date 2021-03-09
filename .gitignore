@@ -17,6 +17,7 @@ x64/
 
 
 # ignore these folders
-.git/
-.vs/
-.vscode/
+.git
+.vs
+.vscode
+coverage
