@@ -1,8 +1,7 @@
 
 IncrementService/obj/
-
 IncrementService/bin/
-
 IncrementService\.Tests/obj/
-
 IncrementService\.Tests/bin/
+.git
+.vs
