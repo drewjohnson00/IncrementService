@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Http;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
 using IncrementService.Models;
-using System.Text.RegularExpressions;
 
 
 namespace IncrementService.Controllers
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Writing to Log.")]
+    //[Authorize]
     [ApiController]
     [Route("[controller]")]
     public class IncrementController : ControllerBase
     {
         private readonly ILogger<IncrementController> _logger;
-        private IIncrementData _model;
+        private readonly IIncrementData _model;
 
         public IncrementController(ILogger<IncrementController> logger, IIncrementData model)
         {
@@ -33,8 +35,13 @@ namespace IncrementService.Controllers
         [HttpGet]
         public ActionResult<IncrementDto> Get()
         {
-            DataResultDto result = _model.GetAllIncrements();
             _logger.LogInformation($"Entering {nameof(Get)}.");
+            if (this.HttpContext.Request.Cookies.Count == 0)
+            {
+                return NotFound("Call login first!");
+            }
+
+            DataResultDto result = _model.GetAllIncrements();
 
             if (result.IsSuccess)
             {
@@ -89,23 +96,6 @@ namespace IncrementService.Controllers
         [HttpPost]
         public ActionResult Post(string key)
         {
-            //var connString = IncrementController.GetConnectionString();
-            //var connString = ConfigurationManager.ConnectionStrings["IncrementConnString"].ConnectionString;
-            //var connString = WebConfigurationManager.ConnectionStrings[0].ConnectionString;
-
-            //string query = "INSERT INTO Keys (IncrementKey, NextValue, IsDeletable) VALUES (@IncrementKey, @NextValue, @IsDeletable)";
-            //using (var conn = new SqlConnection(connString))
-            //using (SqlCommand cmd = new SqlCommand(query, conn))
-            //{
-            //    cmd.Parameters.Add("@IncrementKey", SqlDbType.NVarChar, 50).Value = model.Key;
-            //    cmd.Parameters.Add("@NextValue", SqlDbType.BigInt).Value = model.NextVaue;
-            //    cmd.Parameters.Add("@IsDeletable", SqlDbType.DateTimeOffset).Value = model.LastUsed;
-
-            //    conn.Open();
-            //    cmd.ExecuteNonQuery();
-            //    conn.Close();
-            //}
-
             bool isKeyValid = IncrementController.VerifyIncrementKey(key);
             if (!isKeyValid)
             {
@@ -123,7 +113,7 @@ namespace IncrementService.Controllers
         }
 
         // Add a new Increment
-        [Route("{key}/{initialCount}")]
+        [Route("{key}/{initialCount=1}")]
         [HttpPut]
         public ActionResult Put(string key, long initialCount = 1)
         {

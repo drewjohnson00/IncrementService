@@ -1,8 +1,9 @@
 
 # specific files to ignore
 .suo
-.user
-.sln.docstates
+*.user
+*.sln.docstates
+**/IncrementLog-*.txt
 
 # ignore build output
 [Dd]ebug/

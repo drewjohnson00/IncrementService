@@ -30,13 +30,14 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/Increment",
+      "commandLineArgs": "-p 1433:1433 44349:443 55555:80",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
-        "ASPNETCORE_HTTPS_PORT": "44350"
+        "ASPNETCORE_HTTPS_PORT": "44349"
       },
       "httpPort": 57806,
       "useSSL": true,
-      "sslPort": 44350
+      "sslPort": 44349
     }
   }
 }

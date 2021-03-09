@@ -9,7 +9,7 @@ namespace IncrementService.Models
 {
     public class IncrementModel : IIncrementData
     {
-        private IncrementContext _context;
+        private readonly IncrementContext _context;
 
         public IncrementModel(IncrementContext context)
         {
