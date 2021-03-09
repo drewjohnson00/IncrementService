@@ -1,7 +1,22 @@
 
-IncrementService/obj/
-IncrementService/bin/
-IncrementService\.Tests/obj/
-IncrementService\.Tests/bin/
-.git
-.vs
+# specific files to ignore
+.suo
+.user
+.sln.docstates
+
+# ignore build output
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+x64/
+
+# ignore NuGet packages
+*.nupkg
+**/packages/*
+
+
+# ignore these folders
+.git/
+.vs/
+.vscode/
