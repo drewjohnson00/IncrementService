@@ -1,13 +1,10 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using IncrementService.Controllers;
 using IncrementService.Models;
-using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
 namespace IncrementService.Tests
@@ -27,7 +24,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            CreatedResult result = (CreatedResult)controller.Put(key);
+            var result = (CreatedResult)controller.Put(key);
 
             //Assert
             Assert.AreEqual(201, result.StatusCode);
@@ -42,14 +39,13 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.Put(key);
+            var result = (BadRequestObjectResult)controller.Put(key);
 
             //Assert
             Assert.AreEqual(400, result.StatusCode);
             Assert.AreEqual("Increment Key is not valid.", result.Value.ToString(), true); // true == ignore case
         }
 
-        
         [TestMethod]
         public void AddNewIncrementWithInvalidInitialCountTest()
         {
@@ -59,7 +55,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.Put(key, initialCount);
+            var result = (BadRequestObjectResult)controller.Put(key, initialCount);
 
             //Assert
             Assert.AreEqual(400, result.StatusCode);
@@ -74,7 +70,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            OkResult result = (OkResult)controller.Delete(key);
+            var result = (OkResult)controller.Delete(key);
 
             //Assert
             Assert.AreEqual(200, result.StatusCode);
@@ -88,7 +84,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.Delete(key);
+            var result = (BadRequestObjectResult)controller.Delete(key);
 
             //Assert
             Assert.AreEqual(400, result.StatusCode);
@@ -103,7 +99,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            OkObjectResult result = (OkObjectResult)controller.Post(key);
+            var result = (OkObjectResult)controller.Post(key);
 
             //Assert
             Assert.AreEqual(200, result.StatusCode);
@@ -118,7 +114,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            BadRequestObjectResult result = (BadRequestObjectResult)controller.Post(key);
+            var result = (BadRequestObjectResult)controller.Post(key);
 
             //Assert
             Assert.AreEqual(400, result.StatusCode);
@@ -133,15 +129,15 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            ActionResult<IncrementDto> actionResult = controller.Get(key);
+            ActionResult<IncrementRow> actionResult = controller.Get(key);
             var result = (OkObjectResult)actionResult.Result;
-            var value = (IncrementDto)result.Value;
+            var value = (IncrementRow)result.Value;
 
             //Assert
             Assert.AreEqual(200, result.StatusCode); 
             Assert.AreEqual(key, value.Key);
             Assert.AreEqual(IncrementModelMock.DefaultLastUsedTime, value.LastUsed);
-            Assert.AreEqual(IncrementModelMock.DefaultNextValue, value.NextValue);
+            Assert.AreEqual(IncrementModelMock.DefaultPreviousValue, value.PreviousValue);
         }
 
         [TestMethod]
@@ -152,8 +148,8 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            ActionResult<IncrementDto> actionResult = controller.Get(key);
-            BadRequestObjectResult result = (BadRequestObjectResult)actionResult.Result;
+            ActionResult<IncrementRow> actionResult = controller.Get(key);
+            var result = (BadRequestObjectResult)actionResult.Result;
 
             //Assert
             Assert.AreEqual(400, result.StatusCode);
@@ -167,9 +163,9 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            ActionResult<IncrementDto> actionResult = controller.Get();
+            ActionResult<IncrementRow> actionResult = controller.Get();
             var result = (OkObjectResult)actionResult.Result;
-            var value = (List<IncrementDto>)result.Value;
+            var value = (List<IncrementRow>)result.Value;
 
             //Assert
             Assert.AreEqual(200, result.StatusCode);
@@ -182,7 +178,7 @@ namespace IncrementService.Tests
 
         // ----------------- END OF TESTS -------------------
 
-        private IncrementController CreateControllerInstance()
+        private static IncrementController CreateControllerInstance()
         {
             var model = new IncrementModelMock();
 

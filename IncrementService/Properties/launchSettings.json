@@ -3,8 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:57804",
-      "sslPort": 44349
+      "applicationUrl": "http://localhost:52040",
+      "sslPort": 0
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
@@ -28,9 +28,9 @@
     },
     "Docker": {
       "commandName": "Docker",
+      "commandLineArgs": "-p 1433:1433 44349:443 55555:80",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/Increment",
-      "commandLineArgs": "-p 1433:1433 44349:443 55555:80",
       "environmentVariables": {
         "ASPNETCORE_URLS": "https://+:443;http://+:80",
         "ASPNETCORE_HTTPS_PORT": "44349"

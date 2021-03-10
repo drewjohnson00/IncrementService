@@ -16,70 +16,70 @@ namespace IncrementService.Models
             _context = context;
         }
 
-        public DataResultDto AddIncrement(string incrementKey, long initialValue)
+        public ModelResponse AddIncrement(string incrementKey, long initialValue)
         {
-            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
             if (increment != null)  // does key exist?
             {
-                return new DataResultDto(false, 0, "Key already exists.", null);
+                return new ModelResponse(false, 0, "Key already exists.", null);
             }
 
-            _context.Increments.Add(new IncrementDto { Key = incrementKey, LastUsed = DateTimeOffset.Now, NextValue = initialValue });
+            _context.Increments.Add(new IncrementRow { Key = incrementKey, LastUsed = DateTimeOffset.Now, PreviousValue = initialValue });
             _context.SaveChanges();
 
-            return new DataResultDto(true, 0, "", new List<IncrementDto>{increment});
+            return new ModelResponse(true, 0, "", new List<IncrementRow>{increment});
         }
 
-        public DataResultDto GetAllIncrements()
+        public ModelResponse GetAllIncrements()
         {
-            List<IncrementDto> increments = _context.Increments.ToList();
-            return new DataResultDto(true, 0, "", increments);
+            List<IncrementRow> increments = _context.Increments.ToList();
+            return new ModelResponse(true, 0, "", increments);
         }
 
-        public DataResultDto GetIncrement(string incrementKey)
+        public ModelResponse GetIncrement(string incrementKey)
         {
-            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
             if (increment == null)
             {
-                return new DataResultDto(false, 0, "Key not found.", null);
+                return new ModelResponse(false, 0, "Key not found.", null);
             }
 
-            return new DataResultDto(true, 0, "", new List<IncrementDto> { increment });
+            return new ModelResponse(true, 0, "", new List<IncrementRow> { increment });
         }
 
-        public DataResultDto Increment(string IncrementKey)
+        public ModelResponse Increment(string IncrementKey)
         {
-            IncrementDto increment = _context.Increments.FirstOrDefault(x => x.Key == IncrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == IncrementKey);
 
             if (increment == null)
             {
-                return new DataResultDto(false, 0, "Key not found.", null);
+                return new ModelResponse(false, 0, "Key not found.", null);
             }
 
-            increment.NextValue++;
+            increment.PreviousValue++;
             increment.LastUsed = DateTimeOffset.Now ;
 
             _context.SaveChanges();
 
-            return new DataResultDto(true, 0, "", new List<IncrementDto> { increment });
+            return new ModelResponse(true, 0, "", new List<IncrementRow> { increment });
         }
 
-        public DataResultDto RemoveIncrement(string incrementKey)
+        public ModelResponse RemoveIncrement(string incrementKey)
         {
-            IncrementDto increment = _context.Increments.FirstOrDefault(X => X.Key == incrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(X => X.Key == incrementKey);
 
             if (increment == null)
             {
-                return new DataResultDto(false, 0, "Key not found.", null);
+                return new ModelResponse(false, 0, "Key not found.", null);
             }
 
             _context.Increments.Remove(increment);
 
             _context.SaveChanges();
 
-            return new DataResultDto(true, 0, "", null);
+            return new ModelResponse(true, 0, "", null);
         }
     }
 }

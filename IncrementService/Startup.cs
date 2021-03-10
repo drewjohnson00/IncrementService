@@ -41,7 +41,7 @@ namespace IncrementService
             {
                 options.UseSqlServer(Configuration.GetConnectionString("IncrementService"));
             });
-            services.AddAuthentication();
+            //services.AddAuthentication();
 
         //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             //{

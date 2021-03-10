@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 using IncrementService.Models;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace IncrementService.Data
 {
     public class IncrementContext : DbContext
     {
-        public DbSet<IncrementDto> Increments { get; set; }
+        public DbSet<IncrementRow> Increments { get; set; }
 
         public IncrementContext(DbContextOptions<IncrementContext> options) : base(options) { }
 
@@ -21,14 +18,6 @@ namespace IncrementService.Data
                 throw new ArgumentException("DbContextOptionsBuilder parameter cannot be NULL.");
             }
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
-        }
-
-        //.UseSqlServer(GetConnectionString(), providerOptions => providerOptions.CommandTimeout(10))
-
-
-        private static string GetConnectionString()
-        {        // TODO -- Get this from the web.config
-            return "Data Source=.;Initial Catalog=IncrementService;Integrated Security=True;MultipleActiveResultSets=True";
         }
     }
 }

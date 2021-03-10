@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Net.Http;
-using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using IncrementService.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
-using IncrementService.Models;
 
 
 namespace IncrementService.Controllers
@@ -33,15 +23,15 @@ namespace IncrementService.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IncrementDto> Get()
+        public ActionResult<IncrementRow> Get()
         {
             _logger.LogInformation($"Entering {nameof(Get)}.");
-            if (this.HttpContext.Request.Cookies.Count == 0)
-            {
-                return NotFound("Call login first!");
-            }
+            //if (this.HttpContext.Request.Cookies.Count == 0)
+            //{
+            //    return NotFound("Call login first!");
+            //}
 
-            DataResultDto result = _model.GetAllIncrements();
+            ModelResponse result = _model.GetAllIncrements();
 
             if (result.IsSuccess)
             {
@@ -56,7 +46,7 @@ namespace IncrementService.Controllers
         //[Route("increment/{key}")]
         [Route("{key}")]
         [HttpGet]
-        public ActionResult<IncrementDto> Get(string key)
+        public ActionResult<IncrementRow> Get(string key)
         {
             //var connString = GetConnectionString();
             //long result = 0;
@@ -82,7 +72,7 @@ namespace IncrementService.Controllers
                 return BadRequest("Increment Key is not valid.");
             }
 
-            DataResultDto result = _model.GetIncrement(key);
+            ModelResponse result = _model.GetIncrement(key);
 
             if (result.IsSuccess)
             {
@@ -102,11 +92,11 @@ namespace IncrementService.Controllers
                 return BadRequest("Increment Key is not valid.");
             }
 
-            DataResultDto result = _model.Increment(key);
+            ModelResponse result = _model.Increment(key);
 
             if(result.IsSuccess)
             {
-                return Ok(result.Results[0].NextValue);
+                return Ok(result.Results[0].PreviousValue);
             }
 
             return NotFound(result.ErrorMessage);   // TODO -- Change message if user isn't admin?
@@ -128,7 +118,7 @@ namespace IncrementService.Controllers
                 return BadRequest("Invalid Initial Count.");
             }
 
-            DataResultDto result = _model.AddIncrement(key, initialCount);
+            ModelResponse result = _model.AddIncrement(key, initialCount);
 
             if(!result.IsSuccess)
             {
@@ -149,7 +139,7 @@ namespace IncrementService.Controllers
                 return BadRequest("Increment Key is not valid.");
             }
 
-            DataResultDto result = _model.RemoveIncrement(key);
+            ModelResponse result = _model.RemoveIncrement(key);
             if (!result.IsSuccess)
             {
                 return Ok(result.ErrorMessage);
