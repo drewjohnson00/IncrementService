@@ -70,7 +70,7 @@ namespace IncrementService.Tests
             IncrementController controller = CreateControllerInstance();
 
             // Act
-            var result = (OkResult)controller.Delete(key);
+            var result = (OkObjectResult)controller.Delete(key);
 
             //Assert
             Assert.AreEqual(200, result.StatusCode);
@@ -131,13 +131,13 @@ namespace IncrementService.Tests
             // Act
             ActionResult<IncrementRow> actionResult = controller.Get(key);
             var result = (OkObjectResult)actionResult.Result;
-            var value = (IncrementRow)result.Value;
+            var value = (List<IncrementRow>)result.Value;
 
             //Assert
             Assert.AreEqual(200, result.StatusCode); 
-            Assert.AreEqual(key, value.Key);
-            Assert.AreEqual(IncrementModelMock.DefaultLastUsedTime, value.LastUsed);
-            Assert.AreEqual(IncrementModelMock.DefaultPreviousValue, value.PreviousValue);
+            Assert.AreEqual(key, value[0].Key);
+            Assert.AreEqual(IncrementModelMock.DefaultLastUsedTime, value[0].LastUsed);
+            Assert.AreEqual(IncrementModelMock.DefaultPreviousValue, value[0].PreviousValue);
         }
 
         [TestMethod]

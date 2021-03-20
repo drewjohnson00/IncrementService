@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IncrementService.Controllers
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Writing to Log.")]
     //[Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -25,7 +24,7 @@ namespace IncrementService.Controllers
         [HttpGet]
         public ActionResult<IncrementRow> Get()
         {
-            _logger.LogInformation($"Entering {nameof(Get)}.");
+            _logger.LogInformation("Entering {Method}", nameof(Get));
             //if (this.HttpContext.Request.Cookies.Count == 0)
             //{
             //    return NotFound("Call login first!");
@@ -35,40 +34,23 @@ namespace IncrementService.Controllers
 
             if (result.IsSuccess)
             {
-                _logger.LogInformation($"Exiting {nameof(Get)}. Success!");
+                _logger.LogInformation("Exiting {Method}...success!", nameof(Get));
                 return Ok(result.Results);
             }
 
-            _logger.LogWarning($"Exiting {nameof(Get)} with an error: {result.ErrorMessage}");
-            return NotFound(result.ErrorMessage);   // TODO -- If I'm an admin, return a different message than otherwise.
+            _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Get), result.ErrorMessage);
+            return NotFound(result.ErrorMessage);   // TODO -- If I'm an admin, return a different message with more details.
         }
 
-        //[Route("increment/{key}")]
         [Route("{key}")]
         [HttpGet]
         public ActionResult<IncrementRow> Get(string key)
         {
-            //var connString = GetConnectionString();
-            //long result = 0;
+            _logger.LogInformation("Entering {Method} with key: {Key}.", nameof(Get), key);
 
-            //using (var conn = new SqlConnection(connString))
-            //using (var cmd = new SqlCommand("IncrementKey", conn) { CommandType = CommandType.StoredProcedure })
-            //{
-            //    cmd.Parameters.Add("@Key", SqlDbType.NVarChar, 50).Value = key;
-
-            //    SqlParameter nv = new SqlParameter("@NewValue", SqlDbType.BigInt);
-            //    nv.Direction = ParameterDirection.Output;
-            //    nv.Value = result;
-            //    cmd.Parameters.Add(nv);
-            //    conn.Open();
-            //    cmd.ExecuteNonQuery();
-            //    result = (long)nv.Value;
-            //    conn.Close();
-            //}
-
-            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
-            if (!isKeyValid)
+            if (!VerifyIncrementKey(key))
             {
+                _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Get), "Increment Key is not valid.");
                 return BadRequest("Increment Key is not valid.");
             }
 
@@ -76,9 +58,11 @@ namespace IncrementService.Controllers
 
             if (result.IsSuccess)
             {
-                return Ok(result.Results[0]);
+                _logger.LogInformation("Exiting {Method}...success!", nameof(Get));
+                return Ok(result.Results);
             }
 
+            _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Get), "Key not found.");
             return NotFound(result.ErrorMessage);
         }
 
@@ -86,9 +70,10 @@ namespace IncrementService.Controllers
         [HttpPost]
         public ActionResult Post(string key)
         {
-            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
-            if (!isKeyValid)
+            _logger.LogInformation("Entering {Method} with key: {Key}.", nameof(Post), key);
+            if (!VerifyIncrementKey(key))
             {
+                _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Post), "Increment Key is not valid.");
                 return BadRequest("Increment Key is not valid.");
             }
 
@@ -96,9 +81,11 @@ namespace IncrementService.Controllers
 
             if(result.IsSuccess)
             {
+                _logger.LogInformation("Exiting {Method}...success!", nameof(Post));
                 return Ok(result.Results[0].PreviousValue);
             }
 
+            _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Post), "Key not found.");
             return NotFound(result.ErrorMessage);   // TODO -- Change message if user isn't admin?
         }
 
@@ -107,25 +94,29 @@ namespace IncrementService.Controllers
         [HttpPut]
         public ActionResult Put(string key, long initialCount = 1)
         {
-            bool isKeyValid = IncrementController.VerifyIncrementKey(key);
-            if (!isKeyValid)
+            _logger.LogInformation("Entering {Method} with key: {Key} and initialCount: {Count}.", nameof(Put), key, initialCount);
+            if (!VerifyIncrementKey(key))
             {
+                _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Put), "Increment Key is not valid.");
                 return BadRequest("Increment Key is not valid.");
             }
 
             if (initialCount < 1)
             {
+                _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Put), "Invalid Initial Count.");
                 return BadRequest("Invalid Initial Count.");
             }
 
             ModelResponse result = _model.AddIncrement(key, initialCount);
 
-            if(!result.IsSuccess)
+            if(result.IsSuccess)
             {
-                return Ok(result.ErrorMessage);
+                _logger.LogInformation("Exiting {Method}...success!", nameof(Put));
+                return Created(new Uri($"{this.Request.Scheme}://{this.Request.Host}/Increment/{key}"), null);
             }
 
-            return Created(new Uri($"{this.Request.Scheme}://{this.Request.Host}/Increment/{key}"), null);
+            _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Put), result.ErrorMessage);
+            return Ok(result.ErrorMessage);
         }
 
 
@@ -133,19 +124,22 @@ namespace IncrementService.Controllers
         [HttpDelete]
         public ActionResult Delete(string key)
         {
-            bool isKeyValid = VerifyIncrementKey(key);
-            if (!isKeyValid)
+            _logger.LogInformation("Entering {Method} with key: {Key}.", nameof(Delete), key);
+            if (!VerifyIncrementKey(key))
             {
+                _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Delete), "Increment Key is not valid.");
                 return BadRequest("Increment Key is not valid.");
             }
 
             ModelResponse result = _model.RemoveIncrement(key);
             if (!result.IsSuccess)
             {
-                return Ok(result.ErrorMessage);
+                _logger.LogInformation("Exiting {Method}...success!", nameof(Delete));
+                return Ok();
             }
 
-            return Ok();
+            _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Delete), result.ErrorMessage);
+            return Ok(result.ErrorMessage);
         }
 
         private static bool VerifyIncrementKey(string key)

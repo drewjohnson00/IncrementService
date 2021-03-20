@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
+
 
 namespace IncrementService
 {
@@ -15,16 +16,18 @@ namespace IncrementService
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "It's Main and we're wrapping application startup.")]
         public static int Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
-                .WriteTo.File("IncrementLog-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                .ReadFrom.Configuration(configuration, sectionName: "Serilog")
                 .CreateLogger();
 
             try
             {
-                Log.Debug("Starting web host");
-                Log.Information("Starting web host");
-                Log.Warning("Starting web host");
+                Log.Logger.Information("Calling CreateHostBuilder");
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }

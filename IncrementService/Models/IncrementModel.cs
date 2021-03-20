@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using IncrementService.Data;
+
 
 namespace IncrementService.Models
 {
@@ -18,17 +17,19 @@ namespace IncrementService.Models
 
         public ModelResponse AddIncrement(string incrementKey, long initialValue)
         {
-            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
+            IncrementRow incrementRow = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
-            if (increment != null)  // does key exist?
+            if (incrementRow != null)
             {
                 return new ModelResponse(false, 0, "Key already exists.", null);
             }
 
-            _context.Increments.Add(new IncrementRow { Key = incrementKey, LastUsed = DateTimeOffset.Now, PreviousValue = initialValue });
+            incrementRow = new IncrementRow {Key = incrementKey, LastUsed = DateTimeOffset.Now, PreviousValue = initialValue};
+
+            _context.Increments.Add(incrementRow);
             _context.SaveChanges();
 
-            return new ModelResponse(true, 0, "", new List<IncrementRow>{increment});
+            return new ModelResponse(true, 0, "", new List<IncrementRow> { incrementRow });
         }
 
         public ModelResponse GetAllIncrements()
@@ -49,9 +50,9 @@ namespace IncrementService.Models
             return new ModelResponse(true, 0, "", new List<IncrementRow> { increment });
         }
 
-        public ModelResponse Increment(string IncrementKey)
+        public ModelResponse Increment(string incrementKey)
         {
-            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == IncrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
             if (increment == null)
             {
@@ -68,7 +69,7 @@ namespace IncrementService.Models
 
         public ModelResponse RemoveIncrement(string incrementKey)
         {
-            IncrementRow increment = _context.Increments.FirstOrDefault(X => X.Key == incrementKey);
+            IncrementRow increment = _context.Increments.FirstOrDefault(x => x.Key == incrementKey);
 
             if (increment == null)
             {
