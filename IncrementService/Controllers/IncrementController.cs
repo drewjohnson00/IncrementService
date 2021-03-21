@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using IncrementService.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,9 +14,9 @@ namespace IncrementService.Controllers
     public class IncrementController : ControllerBase
     {
         private readonly ILogger<IncrementController> _logger;
-        private readonly IIncrementData _model;
+        private readonly IIncrementModel _model;
 
-        public IncrementController(ILogger<IncrementController> logger, IIncrementData model)
+        public IncrementController(ILogger<IncrementController> logger, IIncrementModel model)
         {
             _logger = logger;
             _model = model;
@@ -30,7 +31,17 @@ namespace IncrementService.Controllers
             //    return NotFound("Call login first!");
             //}
 
-            ModelResponse result = _model.GetAllIncrements();
+            ModelResponse result = null;
+
+            try
+            {
+                result = _model.GetAllIncrements();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception was thrown in method {Method}.", ex, nameof(Get));
+                return StatusCode(StatusCodes.Status500InternalServerError); // TODO -- Include exception if in development mode
+            }
 
             if (result.IsSuccess)
             {
@@ -39,7 +50,7 @@ namespace IncrementService.Controllers
             }
 
             _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Get), result.ErrorMessage);
-            return NotFound(result.ErrorMessage);   // TODO -- If I'm an admin, return a different message with more details.
+            return NotFound(result.ErrorMessage);
         }
 
         [Route("{key}")]
@@ -54,7 +65,17 @@ namespace IncrementService.Controllers
                 return BadRequest("Increment Key is not valid.");
             }
 
-            ModelResponse result = _model.GetIncrement(key);
+            ModelResponse result = null;
+
+            try
+            {
+                result = _model.GetIncrement(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception was thrown in method {Method}.", ex, nameof(Get));
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
 
             if (result.IsSuccess)
             {
@@ -71,15 +92,26 @@ namespace IncrementService.Controllers
         public ActionResult Post(string key)
         {
             _logger.LogInformation("Entering {Method} with key: {Key}.", nameof(Post), key);
+
             if (!VerifyIncrementKey(key))
             {
                 _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Post), "Increment Key is not valid.");
                 return BadRequest("Increment Key is not valid.");
             }
 
-            ModelResponse result = _model.Increment(key);
+            ModelResponse result = null;
 
-            if(result.IsSuccess)
+            try
+            {
+                result = _model.Increment(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception was thrown in method {Method}.", ex, nameof(Post));
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            if (result.IsSuccess)
             {
                 _logger.LogInformation("Exiting {Method}...success!", nameof(Post));
                 return Ok(result.Results[0].PreviousValue);
@@ -95,6 +127,7 @@ namespace IncrementService.Controllers
         public ActionResult Put(string key, long initialCount = 1)
         {
             _logger.LogInformation("Entering {Method} with key: {Key} and initialCount: {Count}.", nameof(Put), key, initialCount);
+
             if (!VerifyIncrementKey(key))
             {
                 _logger.LogWarning("Exiting {Method} with error: {Error}", nameof(Put), "Increment Key is not valid.");
@@ -107,9 +140,19 @@ namespace IncrementService.Controllers
                 return BadRequest("Invalid Initial Count.");
             }
 
-            ModelResponse result = _model.AddIncrement(key, initialCount);
+            ModelResponse result = null;
 
-            if(result.IsSuccess)
+            try
+            {
+                result = _model.AddIncrement(key, initialCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception was thrown in method {Method}.", ex, nameof(Put));
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            if (result.IsSuccess)
             {
                 _logger.LogInformation("Exiting {Method}...success!", nameof(Put));
                 return Created(new Uri($"{this.Request.Scheme}://{this.Request.Host}/Increment/{key}"), null);
@@ -131,7 +174,18 @@ namespace IncrementService.Controllers
                 return BadRequest("Increment Key is not valid.");
             }
 
-            ModelResponse result = _model.RemoveIncrement(key);
+            ModelResponse result = null;
+
+            try
+            {
+                result = _model.RemoveIncrement(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An exception was thrown in method {Method}.", ex, nameof(Delete));
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
             if (!result.IsSuccess)
             {
                 _logger.LogInformation("Exiting {Method}...success!", nameof(Delete));

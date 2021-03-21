@@ -2,7 +2,7 @@
 
 namespace IncrementService.Models
 {
-    public interface IIncrementData
+    public interface IIncrementModel
     {
         ModelResponse AddIncrement(string incrementKey, long initialValue);
         ModelResponse RemoveIncrement(string incrementKey);

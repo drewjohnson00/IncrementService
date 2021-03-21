@@ -6,7 +6,7 @@ using IncrementService.Data;
 
 namespace IncrementService.Models
 {
-    public class IncrementModel : IIncrementData
+    public class IncrementModel : IIncrementModel
     {
         private readonly IncrementContext _context;
 
@@ -21,7 +21,7 @@ namespace IncrementService.Models
 
             if (incrementRow != null)
             {
-                return new ModelResponse(false, 0, "Key already exists.", null);
+                return new ModelResponse(false, "Key already exists.", null);
             }
 
             incrementRow = new IncrementRow {Key = incrementKey, LastUsed = DateTimeOffset.Now, PreviousValue = initialValue};
@@ -29,13 +29,13 @@ namespace IncrementService.Models
             _context.Increments.Add(incrementRow);
             _context.SaveChanges();
 
-            return new ModelResponse(true, 0, "", new List<IncrementRow> { incrementRow });
+            return new ModelResponse(true, "", new List<IncrementRow> { incrementRow });
         }
 
         public ModelResponse GetAllIncrements()
         {
             List<IncrementRow> increments = _context.Increments.ToList();
-            return new ModelResponse(true, 0, "", increments);
+            return new ModelResponse(true, "", increments);
         }
 
         public ModelResponse GetIncrement(string incrementKey)
@@ -44,10 +44,10 @@ namespace IncrementService.Models
 
             if (increment == null)
             {
-                return new ModelResponse(false, 0, "Key not found.", null);
+                return new ModelResponse(false, "Key not found.", null);
             }
 
-            return new ModelResponse(true, 0, "", new List<IncrementRow> { increment });
+            return new ModelResponse(true, "", new List<IncrementRow> { increment });
         }
 
         public ModelResponse Increment(string incrementKey)
@@ -56,7 +56,7 @@ namespace IncrementService.Models
 
             if (increment == null)
             {
-                return new ModelResponse(false, 0, "Key not found.", null);
+                return new ModelResponse(false, "Key not found.", null);
             }
 
             increment.PreviousValue++;
@@ -64,7 +64,7 @@ namespace IncrementService.Models
 
             _context.SaveChanges();
 
-            return new ModelResponse(true, 0, "", new List<IncrementRow> { increment });
+            return new ModelResponse(true, "", new List<IncrementRow> { increment });
         }
 
         public ModelResponse RemoveIncrement(string incrementKey)
@@ -73,14 +73,14 @@ namespace IncrementService.Models
 
             if (increment == null)
             {
-                return new ModelResponse(false, 0, "Key not found.", null);
+                return new ModelResponse(false, "Key not found.", null);
             }
 
             _context.Increments.Remove(increment);
 
             _context.SaveChanges();
 
-            return new ModelResponse(true, 0, "", null);
+            return new ModelResponse(true, "", null);
         }
     }
 }

@@ -6,7 +6,7 @@ using IncrementService.Models;
 
 namespace IncrementService.Tests
 {
-    public class IncrementModelMock : IIncrementData
+    public class IncrementModelMock : IIncrementModel
     {
         public static string DefaultKeyOne => "One";
         public static string DefaultKeyTwo => "Two";

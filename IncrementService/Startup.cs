@@ -38,7 +38,7 @@ namespace IncrementService
             ServiceDescriptor x = services.First(a => a.ServiceType.Name == "IWebHostEnvironment");
             bool isDevelopment = ((IWebHostEnvironment) x.ImplementationInstance).IsDevelopment();
 
-            services.AddScoped(typeof(IIncrementData), typeof(IncrementModel));
+            services.AddScoped(typeof(IIncrementModel), typeof(IncrementModel));
             services.AddDbContext<IncrementContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("IncrementService"));
