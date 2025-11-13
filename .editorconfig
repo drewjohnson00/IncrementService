@@ -1,0 +1,4 @@
+  [*.cs]
+  dotnet_sort_system_directives_first = true		# sort system usings first
+  dotnet_separate_import_directive_groups = false	# don't "group" usings
+  csharp_prefer_simple_using_statement = true:error # insist on using statements to reduce indentation

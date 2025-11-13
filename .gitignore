@@ -3,7 +3,9 @@
 .suo
 *.user
 *.sln.docstates
+*.ncrunchsolution
 **/IncrementLog-*.txt
+**/appsettings.Development.json
 
 # ignore build output
 [Dd]ebug/
@@ -16,10 +18,11 @@ x64/
 *.nupkg
 **/packages/*
 
-
 # ignore these folders
 .git
+.github
 .vs
 .vscode
 coverage
 Logs
+.NCrunch*

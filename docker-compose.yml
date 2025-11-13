@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  incrementservice:
-    image: IncrementService
-    build:
-      context: .
-      dockerfile: IncrementService/Dockerfile

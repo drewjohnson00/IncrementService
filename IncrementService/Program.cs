@@ -1,53 +1,179 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using System.Text.Json.Serialization;
+using IncrementService.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi;
+using Repository;
 using Serilog;
+using Serilog.Core;
 
+namespace IncrementService;
 
-namespace IncrementService
+public class Program
 {
-    public static class Program
-    {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "It's Main and we're wrapping application startup.")]
-        public static int Main(string[] args)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
+    private static Logger StartupLogger = null!;
+    private static Logger AppLogger = null!;
+    private static string _connectionString;    // TODO - I don't like that this is set as a side effect of ValidateConfiguration. Consider alternatives. Also, the nullability sucks.
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration, sectionName: "Serilog")
+    public static void Main(string[] args)
+    {
+        WebApplication app;
+
+        // Startup logger - only for initialization (always available, even if appsettings.json fails)
+        StartupLogger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.File("Logs/startup.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        StartupLogger.Information("Starting IncrementService...");
+
+        try
+        {
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            // Validate and load configuration from appsettings.json
+            ValidateConfiguration(builder.Configuration, StartupLogger);
+
+            // Application logger - for runtime (uses appsettings.json configuration)
+            AppLogger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
 
-            try
+            // Set the global Serilog logger to the application logger
+            Log.Logger = AppLogger;
+
+            // Clear default logging providers and configure DI to use Serilog for ILogger<T>
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(Log.Logger, dispose: true); 
+
+            StartupLogger.Information("Startup complete, switching to application logger");
+            AppLogger.Information("Application logger active");
+
+            bool isDevelopment = builder.Environment.IsDevelopment();
+
+            builder.Services.AddControllers(options =>
             {
-                Log.Logger.Information("Calling CreateHostBuilder");
-                CreateHostBuilder(args).Build().Run();
-                return 0;
-            }
-            catch (Exception ex)
+                // TODO : Add global filters here
+                // TODO : Set Model State behavior here
+            }).AddJsonOptions(options =>
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
-                return 1;
-            }
-            finally
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Don't get stuck in circular references...just set value to null
+                options.JsonSerializerOptions.PropertyNamingPolicy = null; // Accept default property name capitalization -- PascalCase
+                options.JsonSerializerOptions.WriteIndented = false; // false = don't add extra whitespace for readability
+                options.JsonSerializerOptions.AllowTrailingCommas = true;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault; // Ignore default values during serialization
+            });
+
+            builder.Services.AddRepositoryServices(_connectionString);
+            builder.Services.AddMediatR(cfg =>
             {
-                Log.CloseAndFlush();
-            }
+                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); // include all types in IncrementService project
+                cfg.RegisterServicesFromAssembly(typeof(IIncrementRepository).Assembly); // include all types in Repository project
+                cfg.RegisterServicesFromAssembly(typeof(Infrastructure.IncrementKey).Assembly); // include all types in Infrastructure project
+            });
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "IncrementService API", Version = "v1" });
+
+                //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                options.OrderActionsBy(x =>
+                {
+                    string method = x.HttpMethod switch
+                    {
+                        "GET" => "1",
+                        "POST" => "2",
+                        "PUT" => "3",
+                        "DELETE" => "4",
+                        _ => "5"
+                    };
+
+                    return $"{x.ActionDescriptor.RouteValues["controller"]}_{x.RelativePath}_{method}";
+                    ;
+                });
+            });
+
+            app = builder.Build();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.DefaultModelsExpandDepth(-1); // Disable schema at bottom of Swagger page
+                options.EnableTryItOutByDefault(); // Disable "Try it out" by default for all endpoints
+            });
+
+            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+            app.MapControllers();
+        }
+        catch (Exception ex)
+        {
+            StartupLogger.Fatal(ex, "Application failed to start due to configuration or initialization error");
+            throw;
+        }
+        finally
+        {
+            StartupLogger.Information("Shutting down startup logger");
+            StartupLogger.Dispose();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        app.Run();
+    }
+
+    private static void ValidateConfiguration(IConfiguration configuration, Logger logger)
+    {
+        logger.Information("Validating configuration...");
+
+        // Check if configuration is empty (would indicate appsettings.json didn't load)
+        if (!configuration.AsEnumerable().Any())
+        {
+            const string errorMessage = "Configuration is empty. appsettings.json may not have loaded correctly.";
+            logger.Error("{errorMessage}", errorMessage);
+            throw new InvalidOperationException(errorMessage);
+        }
+
+        // Check for required configuration sections
+        var requiredSections = new[] { "ConnectionStrings", "Serilog", "AllowedHosts" };
+        List<string> missingSections = requiredSections.Where(section => !configuration.GetSection(section).Exists()).ToList();
+
+        if (missingSections.Count != 0)
+        {
+            string errorMessage = $"Required configuration sections missing: {string.Join(", ", missingSections)}. " +
+                                          "Verify appsettings.json is valid and contains all required sections.";
+            logger.Error("{errorMessage}", errorMessage);
+            throw new InvalidOperationException(errorMessage);
+        }
+
+        // Verify connection string is present
+        string? connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            const string errorMessage = "Connection string 'DefaultConnection' is missing or empty. " +
+                                        "Check appsettings.json ConnectionStrings section.";
+            logger.Error("{errorMessage}", errorMessage);
+            throw new InvalidOperationException(errorMessage);
+        }
+
+        _connectionString = connectionString;
+
+        int configCount = configuration.AsEnumerable().Count();
+        Console.WriteLine("✓ Configuration validated successfully");
+        Console.WriteLine($"✓ Found {configCount} configuration entries");
+        logger.Information("Configuration validated successfully. Found {ConfigCount} configuration entries", configCount);
+
+        // Log database name (helpful for diagnostics)
+        if (connectionString.Contains("Database="))
+        {
+            string dbName = connectionString.Split("Database=")[1].Split(';')[0];
+            logger.Information("Connection string configured for database: {Database}", dbName);
+        }
     }
 }
