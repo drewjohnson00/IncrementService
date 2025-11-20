@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Infrastructure;
-using Microsoft.VisualBasic;
 
 namespace Repository.Entities;
 
@@ -20,7 +19,7 @@ internal class Keys
     {
         return new IncrementKey
         {
-            Key = Strings.Trim(IncrementKey),
+            Key = IncrementKey,
             PreviousValue = PreviousValue,
             LastUsed = LastUsed
         };

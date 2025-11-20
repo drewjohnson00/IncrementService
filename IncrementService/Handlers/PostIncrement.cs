@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation;
 using Common.Exceptions;
+using FluentValidation;
 using Infrastructure;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -9,31 +9,29 @@ using Repository;
 
 namespace IncrementService.Handlers;
 
-public class PutIncrementCommand : IncrementCommand, IRequest<IncrementKey> { };
+public class PostIncrementCommand : IncrementCommand, IRequest<IncrementKey>;
 
-internal class PutIncrementValidator : AbstractValidator<PutIncrementCommand>
+internal class PostIncrementValidator : AbstractValidator<PostIncrementCommand>
 {
-    public PutIncrementValidator()
+    public PostIncrementValidator()
     {
         RuleFor(x => x.Key)
             .NotEmpty().WithMessage("Key must be provided.")
             .Matches("^[a-zA-Z0-9_]+$").WithMessage("Key must only contain letters, digits, or underscores.");
-        RuleFor(x => x.PreviousValue)
-            .Must(previousValue => !previousValue.HasValue || previousValue.Value >= 0)
-            .WithMessage("PreviousValue must be greater than or equal to 0.");
     }
 }
 
-public class PutIncrementHandler(IIncrementRepository repository, ILogger<PutIncrementHandler> logger)
-    : IRequestHandler<PutIncrementCommand, IncrementKey>
+public class PostIncrementHandler(IIncrementRepository repository, ILogger<PostIncrementHandler> logger)
+    : IRequestHandler<PostIncrementCommand, IncrementKey>
 {
-    private readonly string _className = nameof(PutIncrementHandler);
+    private readonly string _className = nameof(PostIncrementHandler);
 
-    public async Task<IncrementKey> Handle(PutIncrementCommand command, CancellationToken cancellationToken)
+
+    public async Task<IncrementKey> Handle(PostIncrementCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Entering {Method} method of class {Class}", nameof(Handle), _className);
 
-        PutIncrementValidator validator = new();
+        PostIncrementValidator validator = new();
         var validationResult = await validator.ValidateAsync(command, cancellationToken).ConfigureAwait(false);
 
         if (!validationResult.IsValid)
@@ -44,7 +42,7 @@ public class PutIncrementHandler(IIncrementRepository repository, ILogger<PutInc
             throw new BadRequestException($"Validation failed: {errors}");
         }
 
-        IncrementKey result = await repository.UpsertIncrement(command).ConfigureAwait(false);
+        IncrementKey result = await repository.PostIncrement(command).ConfigureAwait(false);
         return result;
     }
 }

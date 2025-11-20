@@ -128,7 +128,7 @@ public class Program
         app.Run();
     }
 
-    private static void ValidateConfiguration(IConfiguration configuration, Logger logger)
+    private static void ValidateConfiguration(ConfigurationManager configuration, Logger logger)
     {
         logger.Information("Validating configuration...");
 
