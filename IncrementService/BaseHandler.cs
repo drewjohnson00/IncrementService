@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Exceptions;
@@ -11,18 +12,16 @@ public abstract class BaseHandler<TClass, TQuery>
 {
     protected readonly ILogger<TClass> _logger;
     protected readonly AbstractValidator<TQuery>? _validator;
-    protected readonly string _className;
 
     protected BaseHandler(ILogger<TClass> logger, AbstractValidator<TQuery>? validator = null)
     {
         _logger = logger;
-        _className = nameof(TClass);
         _validator = validator; 
     }
 
     protected void TraceLogging()
     {
-        _logger.LogInformation("Entering Handle method of class {Class}", _className);
+        _logger.LogInformation(""); // Since we have source context, this is sufficient for trace logging...
     }
 
     protected async Task ExecValidationsAndThrowOnErrorAsync(TQuery command, CancellationToken token)
@@ -42,9 +41,7 @@ public abstract class BaseHandler<TClass, TQuery>
 
         if (validationResult.IsValid) return;
 
-        string errors = string.Join("; ", validationResult.Errors);
-        _logger.LogWarning("In Handler class {ClassName}, validation failed: {Errors}", _className, errors);
-        throw new BadRequestException($"Validation failed: {errors}");
+        throw new BadRequestException("Validation failed", validationResult.Errors.Select(x => x.ErrorMessage).ToList());   
     }
 }
 

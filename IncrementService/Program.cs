@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using IncrementService.Middleware;
+using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -73,11 +74,28 @@ public class Program
             {
                 options.InvalidModelStateResponseFactory = context =>
                 {
+                    Guid logId = Guid.NewGuid();
+
                     var errors = context.ModelState.Values
                         .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage);
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
 
-                    return new BadRequestObjectResult(new { Errors = errors });
+                    string endpoint = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+
+                    Log.Logger.ForContext<Program>()
+                        .Warning("Model validation failed on {Endpoint}. Errors: {Errors}. LogId: {LogId}",
+                            endpoint, string.Join("; ", errors), logId);
+
+                    context.HttpContext.Response.Headers["X-Correlation-Id"] = logId.ToString();
+
+                    var errorResponse = new ErrorResponse
+                    {
+                        Message = "Validation failed.",
+                        Errors = errors,
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
                 };
             });
 
@@ -86,7 +104,7 @@ public class Program
             {
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); // include all types in IncrementService project
                 cfg.RegisterServicesFromAssembly(typeof(IIncrementRepository).Assembly); // include all types in Repository project
-                cfg.RegisterServicesFromAssembly(typeof(Infrastructure.IncrementKey).Assembly); // include all types in Infrastructure project
+                cfg.RegisterServicesFromAssembly(typeof(IncrementKey).Assembly); // include all types in Infrastructure project
             });
 
             builder.Services.AddSwaggerGen(options =>
@@ -135,6 +153,8 @@ public class Program
             StartupLogger.Information("Shutting down startup logger");
             StartupLogger.Dispose();
         }
+
+        Log.Logger.ForContext<Program>().Information("Setup Complete -- Application Starting...");
 
         app.Run();
     }
