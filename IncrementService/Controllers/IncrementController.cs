@@ -9,14 +9,14 @@ using Microsoft.Extensions.Logging;
 namespace IncrementService.Controllers;
 
 [ApiController]
-[Route("Increment")]
-public class IncrementController : ControllerBase
+[Route("Increments")]
+public class IncrementsController : ControllerBase
 {
-    private readonly ILogger<IncrementController> _logger;
+    private readonly ILogger<IncrementsController> _logger;
     private readonly IMediator _mediator;
     private const string _tracelog = "In IncrementController, Entering method: {Method}";
 
-    public IncrementController(ILogger<IncrementController> logger, IMediator mediator)
+    public IncrementsController(ILogger<IncrementsController> logger, IMediator mediator)
     {
         _logger = logger;
         _mediator = mediator;
@@ -53,7 +53,7 @@ public class IncrementController : ControllerBase
     /// </summary>
     /// <param name="command"></param>
     [HttpPut]
-    public async Task<ActionResult<IncrementKey>> Put(PutIncrementCommand command)
+    public async Task<ActionResult<IncrementKey>> Put([FromBody] PutIncrementCommand command)
     {
         _logger.LogInformation(_tracelog, nameof(Put));
 
@@ -64,7 +64,7 @@ public class IncrementController : ControllerBase
     }
 
     [HttpPost("{key}")]
-    public async Task<ActionResult<IncrementKey>> Post(string key)
+    public async Task<ActionResult<IncrementKey>> Post([FromRoute] string key)
     {
         _logger.LogInformation("Entering {Method} with key: {Key}.", nameof(Post), key);
 

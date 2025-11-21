@@ -37,7 +37,8 @@ public class Program
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            // Validate and load configuration from appsettings.json
+            // TODO Review below...
+            // ExecValidationsAndThrowOnError and load configuration from appsettings.json
             ValidateConfiguration(builder.Configuration, StartupLogger);
 
             // Application logger - for runtime (uses appsettings.json configuration)

@@ -5,8 +5,10 @@ namespace Repository.Entities;
 
 internal class Keys
 {
+    // If Id is required, then you have to set the value to "0" on insert which seems weird.
+    // Since there isn't a compelling reason to set it to required, leaving it as optional.
     [Key]
-    public required long Id { get; set; }
+    public long Id { get; set; }
 
     [StringLength(maximumLength: 50, MinimumLength = 3, ErrorMessage = "Invalid key length.")]
     public required string IncrementKey { get; set; }

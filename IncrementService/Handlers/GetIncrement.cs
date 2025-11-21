@@ -15,42 +15,24 @@ public class GetIncrementQuery : IRequest<IncrementKey>
     public required string Key { get; set; }
 }
 
-public class GetIncrementHandler : IRequestHandler<GetIncrementQuery, IncrementKey>
+internal class GetIncrementValidator : AbstractValidator<GetIncrementQuery>
 {
-    private readonly IIncrementRepository _repository;
-    private readonly ILogger<GetIncrementHandler> _logger;
-    private readonly string _className = nameof(GetIncrementHandler);
-
-    public GetIncrementHandler(IIncrementRepository repository, ILogger<GetIncrementHandler> logger)
+    public GetIncrementValidator()
     {
-        _repository = repository;
-        _logger = logger;
+        RuleFor(x => x.Key)
+            .NotEmpty().WithMessage("Key must be provided.");
     }
+}
 
-    internal class GetIncrementValidator : AbstractValidator<GetIncrementQuery>
-    {
-        public GetIncrementValidator()
-        {
-            RuleFor(x => x.Key)
-                .NotEmpty().WithMessage("Key must be provided.")
-                .Matches("^[a-zA-Z0-9_]+$").WithMessage("Key must only contain letters, digits, or underscores.");
-        }
-    }
-
+public class GetIncrementHandler(IIncrementRepository repository, ILogger<GetIncrementHandler> logger)
+    : BaseHandler<GetIncrementHandler, GetIncrementQuery>(logger, new GetIncrementValidator())
+        ,IRequestHandler<GetIncrementQuery, IncrementKey>
+{
     public async Task<IncrementKey> Handle(GetIncrementQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"Entering {nameof(Handle)} method of class {_className}");
+        await ExecValidationsAndThrowOnErrorAsync(request, cancellationToken).ConfigureAwait(false);
 
-        GetIncrementValidator validator = new();
-        ValidationResult? validationResult = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
-        if (validationResult.IsValid is false)
-        {   // TODO -- improve/consolidate error reporting?
-            string errors = string.Join("; ", validationResult.Errors);
-            _logger.LogWarning("Validation failed for GetIncrementQuery: {Errors}", errors);
-            throw new BadRequestException(errors);
-        }
-
-        IncrementKey? result = await _repository.GetIncrement(request.Key).ConfigureAwait(false);
+        IncrementKey? result = await repository.GetIncrement(request.Key).ConfigureAwait(false);
 
         return result ?? throw new NotFoundException($"Increment key '{request.Key}' not found.");
     }
