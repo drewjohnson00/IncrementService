@@ -59,7 +59,7 @@ public class Program
 
             builder.Services.AddControllers(options =>
             {
-                // TODO: Add global filters here
+                // TODO: Add any global filters here
             }).AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Don't get stuck in circular references...just set value to null
@@ -84,7 +84,7 @@ public class Program
                     string endpoint = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
 
                     Log.Logger.ForContext<Program>()
-                        .Warning("Model validation failed on {Endpoint}. Errors: {Errors}. LogId: {LogId}",
+                        .Warning("Model validation failed on {Endpoint}. ValidationErrors: {ValidationErrors}. LogId: {LogId}",
                             endpoint, string.Join("; ", errors), logId);
 
                     context.HttpContext.Response.Headers["X-Correlation-Id"] = logId.ToString();
@@ -92,7 +92,7 @@ public class Program
                     var errorResponse = new ErrorResponse
                     {
                         Message = "Validation failed.",
-                        Errors = errors,
+                        ValidationErrors = errors,
                     };
 
                     return new BadRequestObjectResult(errorResponse);

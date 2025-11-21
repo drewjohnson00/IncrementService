@@ -69,7 +69,7 @@ public class GlobalExceptionHandlerMiddleware
         var response = new ErrorResponse
         {
             Message = message,
-            Errors = errors
+            ValidationErrors = errors
         };
 
         var jsonResponse = JsonSerializer.Serialize(response);
