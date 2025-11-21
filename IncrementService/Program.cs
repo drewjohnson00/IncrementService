@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using IncrementService.Middleware;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +20,6 @@ public class Program
 {
     private static Logger StartupLogger = null!;
     private static Logger AppLogger = null!;
-    private static string _connectionString;    // TODO - I don't like that this is set as a side effect of ValidateConfiguration. Consider alternatives. Also, the nullability sucks.
 
     public static void Main(string[] args)
     {
@@ -37,9 +37,7 @@ public class Program
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            // TODO Review below...
-            // ExecValidationsAndThrowOnError and load configuration from appsettings.json
-            ValidateConfiguration(builder.Configuration, StartupLogger);
+            string connectionString = ValidateConfigurationAndGetConnectionString(builder.Configuration, StartupLogger);
 
             // Application logger - for runtime (uses appsettings.json configuration)
             AppLogger = new LoggerConfiguration()
@@ -60,8 +58,7 @@ public class Program
 
             builder.Services.AddControllers(options =>
             {
-                // TODO : Add global filters here
-                // TODO : Set Model State behavior here
+                // TODO: Add global filters here
             }).AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Don't get stuck in circular references...just set value to null
@@ -71,7 +68,20 @@ public class Program
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault; // Ignore default values during serialization
             });
 
-            builder.Services.AddRepositoryServices(_connectionString);
+            // Configure consistent error response format for model binding/validation failures
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage);
+
+                    return new BadRequestObjectResult(new { Errors = errors });
+                };
+            });
+
+            builder.Services.AddRepositoryServices(connectionString);
             builder.Services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); // include all types in IncrementService project
@@ -129,7 +139,7 @@ public class Program
         app.Run();
     }
 
-    private static void ValidateConfiguration(ConfigurationManager configuration, Logger logger)
+    private static string ValidateConfigurationAndGetConnectionString(ConfigurationManager configuration, Logger logger)
     {
         logger.Information("Validating configuration...");
 
@@ -163,8 +173,6 @@ public class Program
             throw new InvalidOperationException(errorMessage);
         }
 
-        _connectionString = connectionString;
-
         int configCount = configuration.AsEnumerable().Count();
         Console.WriteLine("✓ Configuration validated successfully");
         Console.WriteLine($"✓ Found {configCount} configuration entries");
@@ -176,5 +184,7 @@ public class Program
             string dbName = connectionString.Split("Database=")[1].Split(';')[0];
             logger.Information("Connection string configured for database: {Database}", dbName);
         }
+
+        return connectionString;
     }
 }
