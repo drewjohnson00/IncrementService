@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Exceptions;
@@ -45,6 +46,10 @@ public class DeleteIncrementTests
         Func<Task> act = async () => await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<BadRequestException>().WithMessage("Validation Failed: Key must be provided.");
+        await act.Should()
+            .ThrowAsync<BadRequestException>()
+            .WithMessage("Validation Failed")
+            .Where(e => e.ValidationErrors.Count == 1)
+            .Where(e => e.ValidationErrors[0] == "Key must be provided.");
     }
 }

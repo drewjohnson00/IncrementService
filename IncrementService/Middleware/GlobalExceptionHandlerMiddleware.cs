@@ -51,7 +51,7 @@ public class GlobalExceptionHandlerMiddleware
             case BadRequestException badRequestException:
                 statusCode = HttpStatusCode.BadRequest;
                 message = badRequestException.Message;
-                errors = badRequestException.Errors;
+                errors = badRequestException.ValidationErrors;
                 _logger.LogWarning(badRequestException, "Bad request: {Message}. LogId: {LogId}", message, logId);
                 break;
 

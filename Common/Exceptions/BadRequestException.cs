@@ -7,18 +7,18 @@ public class BadRequestException : Exception
 {
     public BadRequestException(string message) : base(message)
     {
-        Errors = [];
+        ValidationErrors = [];
     }
 
     public BadRequestException(string message, Exception innerException) : base(message, innerException)
     {
-        Errors = [];
+        ValidationErrors = [];
     }
 
-    public BadRequestException(string message, List<string> errors) : base(message)
+    public BadRequestException(string message, List<string> validationErrors) : base(message)
     {
-        Errors = errors;
+        ValidationErrors = validationErrors;
     }
 
-    public List<string> Errors { get; }
+    public List<string> ValidationErrors { get; }
 }

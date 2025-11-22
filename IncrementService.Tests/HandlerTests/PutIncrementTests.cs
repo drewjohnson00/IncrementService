@@ -1,14 +1,16 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Exceptions;
-using IncrementService.Handlers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Repository;
-using Moq;
-using Microsoft.Extensions.Logging;
 using FluentAssertions;
+using IncrementService.Handlers;
 using Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Repository;
 
 namespace IncrementService.Tests.HandlerTests;
 
@@ -77,7 +79,10 @@ public class PutIncrementTests
 
         // Assert
         await act.Should().ThrowAsync<BadRequestException>()
-            .WithMessage("Validation Failed: Key must be between 3 and 50 characters.; Key must only contain letters, digits, or underscores.");
+            .WithMessage("Validation Failed")
+            .Where(e => e.ValidationErrors.Count == 2)
+            .Where(e => e.ValidationErrors.Contains("Key must be between 3 and 50 characters."))
+            .Where(e => e.ValidationErrors.Contains("Key must only contain letters, digits, or underscores."));
     }
 
     [TestMethod]
@@ -95,7 +100,9 @@ public class PutIncrementTests
 
         // Assert
         await act.Should().ThrowAsync<BadRequestException>()
-            .WithMessage("Validation Failed: Key must be between 3 and 50 characters.");
+            .WithMessage("Validation Failed")
+            .Where(e => e.ValidationErrors.Count == 1)
+            .Where(e => e.ValidationErrors[0] == "Key must be between 3 and 50 characters.");
     }
 
     [TestMethod]
@@ -113,7 +120,9 @@ public class PutIncrementTests
 
         // Assert
         await act.Should().ThrowAsync<BadRequestException>()
-            .WithMessage("Validation Failed: Key must be between 3 and 50 characters.");
+            .WithMessage("Validation Failed")
+            .Where(e => e.ValidationErrors.Count == 1)
+            .Where(e => e.ValidationErrors[0] == "Key must be between 3 and 50 characters.");
     }
 
     [TestMethod]
@@ -134,6 +143,8 @@ public class PutIncrementTests
 
         // Assert
         await act.Should().ThrowAsync<BadRequestException>()
-            .WithMessage("Validation Failed: Key must only contain letters, digits, or underscores.");
+            .WithMessage("Validation Failed")
+            .Where(e => e.ValidationErrors.Count == 1)
+            .Where(e => e.ValidationErrors[0] == "Key must only contain letters, digits, or underscores.");
     }
 }
