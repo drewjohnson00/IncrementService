@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+	  <!-- Prevent npm build on CI if you want: set SkipNpmBuild=true -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="src\ts\" />
+  </ItemGroup>
+
+	<!-- Include generated JS so it is served from wwwroot -->
+	<!--<ItemGroup>
+		<Content Include="wwwroot\js\**\*.*">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>-->
+
+	<!-- Ensure Node/npm build runs before dotnet build/publish -->
+	<Target Name="EnsureNodeModules" BeforeTargets="Build;Publish">
+		<!-- Only run when package.json exists and SkipNpmBuild is not 'true' -->
+		<Exec Command="npm ci" WorkingDirectory="$(ProjectDir)" Condition="Exists('package.json') and '$(SkipNpmBuild)' != 'true'" />
+	</Target>
+
+	<Target Name="BuildClientScripts" BeforeTargets="Build;Publish" DependsOnTargets="EnsureNodeModules">
+		<Exec Command="npm run build" WorkingDirectory="$(ProjectDir)" Condition="Exists('package.json') and '$(SkipNpmBuild)' != 'true'" />
+	</Target>
+
+</Project>
