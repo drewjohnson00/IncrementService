@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="src\ts\" />
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
 	<!-- Include generated JS so it is served from wwwroot -->

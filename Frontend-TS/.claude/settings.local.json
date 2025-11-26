@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(git -C \"C:\\repos\\incrementservice2\" log --oneline -10)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
