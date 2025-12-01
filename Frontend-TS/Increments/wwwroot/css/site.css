@@ -29,3 +29,135 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Increments Dashboard Styles */
+.increments-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.increment-card {
+  flex: 1 1 300px;
+  max-width: 400px;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background-color: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  position: relative;
+}
+
+.increment-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.increment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.increment-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #212529;
+  word-break: break-word;
+}
+
+.increment-card-delete {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.increment-card-delete:hover {
+  color: #a71d2a;
+}
+
+.increment-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.increment-card-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.increment-card-label {
+  font-weight: 500;
+  color: #6c757d;
+  margin: 0;
+}
+
+.increment-card-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+}
+
+.increment-card-value.large {
+  font-size: 1.5rem;
+  color: #0d6efd;
+}
+
+.increment-card-timestamp {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.increment-button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.15s ease-in-out;
+}
+
+.increment-button:hover {
+  background-color: #0b5ed7;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.increment-button:active {
+  background-color: #0a58ca;
+  box-shadow: 0 0.05rem 0.1rem rgba(0, 0, 0, 0.1) inset;
+  transform: translateY(2px);
+}
+
+.increment-button:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  outline: none;
+}
+
+.increment-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}

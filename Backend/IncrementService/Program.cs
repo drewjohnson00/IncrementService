@@ -107,6 +107,32 @@ public class Program
                 cfg.RegisterServicesFromAssembly(typeof(IncrementKey).Assembly); // include all types in Infrastructure project
             });
 
+            // Configure CORS to allow frontend requests
+            // WARNING: AllowAnyOrigin() is NOT SECURE for production - it allows requests from ANY website
+            // Use this configuration for development/learning only
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
+            // Production CORS Configuration Example:
+            // Restrict to specific origins and only allow necessary methods/headers
+            // builder.Services.AddCors(options =>
+            // {
+            //     options.AddDefaultPolicy(policy =>
+            //     {
+            //         policy.WithOrigins("https://yourdomain.com", "https://www.yourdomain.com")
+            //               .AllowAnyMethod()
+            //               .AllowAnyHeader()
+            //               .AllowCredentials(); // Enable if you need cookies/auth tokens
+            //     });
+            // });
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "IncrementService API", Version = "v1" });
@@ -138,6 +164,8 @@ public class Program
                 options.DefaultModelsExpandDepth(-1); // Disable schema at bottom of Swagger page
                 options.EnableTryItOutByDefault(); // Disable "Try it out" by default for all endpoints
             });
+
+            app.UseCors();
 
             app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 

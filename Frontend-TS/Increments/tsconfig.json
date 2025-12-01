@@ -6,7 +6,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    // Development: Inline source maps embed TypeScript sources in JS files for debugging
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    // Production: Disable source maps to reduce file size and avoid 404 warnings
+    // "sourceMap": false,
     "outDir": "wwwroot/js",
     "rootDir": "src/ts",
     "forceConsistentCasingInFileNames": true

@@ -10,17 +10,8 @@ namespace IncrementService.Controllers;
 
 [ApiController]
 [Route("Increments")]
-public class IncrementsController : ControllerBase
+public class IncrementsController(ILogger<IncrementsController> logger, IMediator mediator) : ControllerBase
 {
-    private readonly ILogger<IncrementsController> _logger;
-    private readonly IMediator _mediator;
-
-    public IncrementsController(ILogger<IncrementsController> logger, IMediator mediator)
-    {
-        _logger = logger;
-        _mediator = mediator;
-    }
-
     /// <summary>
     /// Get all Increments
     /// </summary>
@@ -30,10 +21,10 @@ public class IncrementsController : ControllerBase
         // The empty logInfo method below output the following:
         // [INF] (IncrementService.Controllers.IncrementsController) {"ActionId":"<guid>","ActionName":"IncrementService.Controllers.IncrementsController.Get (IncrementService)","RequestId":"<string>:<index>","RequestPath":"/increments","ConnectionId":"<string>"}
         // This is sufficient for tracing the request through the system.
-        _logger.LogInformation(""); 
+        logger.LogInformation(""); 
 
         // MediatR routes this to the GetAllIncrementsHandler because of the GetAllIncrementsQuery type that implements IRequest<List<IncrementKey>>
-        List<IncrementKey> dto = await _mediator.Send(new GetAllIncrementsQuery()).ConfigureAwait(false);
+        List<IncrementKey> dto = await mediator.Send(new GetAllIncrementsQuery()).ConfigureAwait(false);
         return Ok(dto);
     }
 
@@ -44,9 +35,9 @@ public class IncrementsController : ControllerBase
     [HttpGet("{Key}")]
     public async Task<ActionResult<IncrementKey>> Get([FromRoute] GetIncrementQuery query)
     {
-        _logger.LogInformation("");
+        logger.LogInformation("");
 
-        IncrementKey dto = await _mediator.Send(query);
+        IncrementKey dto = await mediator.Send(query);
         return Ok(dto);
     }
 
@@ -57,31 +48,31 @@ public class IncrementsController : ControllerBase
     [HttpPut]
     public async Task<ActionResult<IncrementKey>> Put([FromBody] PutIncrementCommand command)
     {
-        _logger.LogInformation("");
+        logger.LogInformation("");
 
-        IncrementKey dto = await _mediator.Send(command);
+        IncrementKey dto = await mediator.Send(command);
 
-        _logger.LogInformation("Exiting {Method}...success!", nameof(Put));
+        logger.LogInformation("Exiting {Method}...success!", nameof(Put));
         return Ok(dto);
     }
 
     [HttpPost("{key}")]
     public async Task<ActionResult<IncrementKey>> Post([FromRoute] string key)
     {
-        _logger.LogInformation("");
+        logger.LogInformation("");
 
-        IncrementKey dto = await _mediator.Send(new PostIncrementCommand() { Key = key });
+        IncrementKey dto = await mediator.Send(new PostIncrementCommand() { Key = key });
         return Ok(dto);
     }
 
     [HttpDelete("{Key}")]
     public async Task<ActionResult> Delete([FromRoute] DeleteIncrementCommand command)
     {
-        _logger.LogInformation("");
+        logger.LogInformation("");
 
-        await _mediator.Send(command);
+        await mediator.Send(command);
 
-        _logger.LogInformation("Exiting {Method}...success!", nameof(Delete));
+        logger.LogInformation("Exiting {Method}...success!", nameof(Delete));
         return Ok();
     }
 }
