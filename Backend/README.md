@@ -8,5 +8,3 @@ MediatR is used in the API to decouple the controllers from the business logic. 
 In this example, the Keys table has an internal-only ID field that is not exposed via the API. The repository works with this internal ID field, but the ID field doesn't leave the repository. This is ideal and isn't always possible (e.g. when the ID is a foreign key to other tables).
 
 Also, in the PUT repository method, there is too much logic that can't be unit tested.
-
-
